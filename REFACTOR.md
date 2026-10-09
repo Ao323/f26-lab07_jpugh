@@ -13,20 +13,24 @@ Keep it short and specific. Point at methods, call sites, and test names.
 
 ### The pin (write this section before you direct the refactor)
 
-**The pin.** File and test name, plus one sentence naming the method and the
-observable result it pins. Not "recurring bookings work". Green against the
-shipped code, and you did not edit or delete an existing test method to get
-there.
+**The pin.**
+NotificationHubTest.java
 
-**Why that one, and does a shipped test already cover it?** Of everything
-`BookingWorkflow` does, why is this the behavior worth a test? If something
-shipped comes close, say what your pin adds. If nothing does, say how you
-checked.
+subscribingAddsAnotherDeliveryTarget: calling subscribe increases subscriberCount() by one and leaves the built-in outbox subscriber intact
+
+**Why that one, and does a shipped test already cover it?** 
+
+I choose this one because I noticed NotificationHub had the fewest test associated with it and only one test associated with subscription, so I wanted to add more tests related to that. If something shipped adds multiple subscribers it checks that all those subscribes are accounted for by creating a subscriber and checking that the total number has increased by 1. 
 
 **What a regeneration would do differently here.** Suppose someone
 threw this class away and regenerated it from a one-line description of what a
 booking workflow does. Name the decision that would be made a second time, and
 say which way it would probably go.
+
+The repeated decision is the notification data representation and collection structure: whether to store already-rendered message text, and how to retain it and distribute it. It end result would probably be the same, the outbox would store rendered String messages in an ordered List<String> backed by ArrayList, subscribers would be held in a List<NotificationSubscriber> backed by ArrayList, preserving registration order, and the rendering mechanism would be held through the NotificationStrategy interface, allowing the workflow to publish without depending on a concrete formatter.
+
+It would end up the same since these choices are straightforward, simple and a natural workflow for the agent to follow. 
+
 
 ### The directive
 

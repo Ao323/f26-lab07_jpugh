@@ -1,5 +1,11 @@
 package edu.cmu.cs214.scheduling.notify;
 
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import org.junit.jupiter.api.Test;
+
 import edu.cmu.cs214.scheduling.domain.BookingRequest;
 import edu.cmu.cs214.scheduling.domain.BookingStore;
 import edu.cmu.cs214.scheduling.domain.Member;
@@ -7,13 +13,6 @@ import edu.cmu.cs214.scheduling.domain.MembershipTier;
 import edu.cmu.cs214.scheduling.domain.Room;
 import edu.cmu.cs214.scheduling.pricing.PriceCalculator;
 import edu.cmu.cs214.scheduling.workflow.BookingWorkflow;
-
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 class NotificationHubTest {
 
@@ -38,6 +37,20 @@ class NotificationHubTest {
         NotificationHub hub = new NotificationHub();
 
         assertEquals(1, hub.subscriberCount());
+    }
+
+    @Test
+    void subscribingAddsAnotherDeliveryTarget() {
+        NotificationHub hub = new NotificationHub();
+
+        hub.subscribe(rendered -> { });
+
+        assertEquals(2, hub.subscriberCount());
+
+        hub.publish(new NotificationMessage("ada@rooms.example.edu", "Booking confirmed",
+                "Room Willow Room from 2026-10-05T09:00 to 2026-10-05T10:00", MON_9AM));
+
+        assertEquals(1, hub.getOutbox().size());
     }
 
     @Test
